@@ -32,15 +32,18 @@ Votre smart contract doit s’appeler “Voting”.
 Votre smart contract doit utiliser la dernière version du compilateur.
 L’administrateur est celui qui va déployer le smart contract. 
 Votre smart contract doit définir les structures de données suivantes : 
+
 struct Voter {
 bool isRegistered;
 bool hasVoted;
 uint votedProposalId;
 }
+
 struct Proposal {
 string description;
 uint voteCount;
 }
+
 Votre smart contract doit définir une énumération qui gère les différents états d’un vote
 enum WorkflowStatus {
 RegisteringVoters,
@@ -50,6 +53,7 @@ VotingSessionStarted,
 VotingSessionEnded,
 VotesTallied
 }
+
 Votre smart contract doit définir un uint winningProposalId qui représente l’id du gagnant ou une fonction getWinner qui retourne le gagnant.
 Votre smart contract doit importer le smart contract la librairie “Ownable” d’OpenZepplin.
 Votre smart contract doit définir les événements suivants : 
