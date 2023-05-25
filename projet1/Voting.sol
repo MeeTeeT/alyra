@@ -9,47 +9,47 @@ pragma solidity 0.8.20;
 
 import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol";
 
-contract Storage is Ownable {
-    constructor() Ownable() {
-        voteStatus = WorkflowStatus.RegisteringVoters; //Vote status is defined as registering voter at smart contract deployment.
-    }
+error Voting__ProposalAlreadyExists();
+
+contract Voting is Ownable {
+    //constructor() Ownable() {}
+
+    uint winningProposalId; //Winning proposal Id
+    Proposal winningProposal; // Winning proposal details
+
+    WorkflowStatus voteStatus; // Actual status of voting stage
+
+    mapping(address => bool) whitelist; // Mapping address -> whitelisted users
+    mapping(address => Voter) voters; // Mapping address ->  voter struct
+    Proposal[] proposals; // Array of proposal
 
     event VoterRegistered(address voterAddress); // event when a voter is whitelisted
     event WorkflowStatusChange(
         WorkflowStatus previousStatus,
         WorkflowStatus newStatus
-    ); // event when vote status change
+    ); // event when vote stage change
     event ProposalRegistered(uint proposalId); // event when a new proposal is registered
     event Voted(address voter, uint proposalId); //event when a new vote
 
     struct Voter {
         bool isRegistered; //if true, voter is whitelisted
         bool hasVoted; //if true, voter has already voted
-        uint votedProposalId; //id in proposal array of the proposal voted
+        uint votedProposalId; //id in proposal array of the proposals[]
     }
 
     struct Proposal {
-        string description; //proposal'a name
+        string description; //proposal'a description
         uint voteCount; // vote count for the proposal
     }
 
     enum WorkflowStatus {
         RegisteringVoters, //whitelisting users
-        ProposalsRegistrationStarted, //Proposals start
+        ProposalsRegistrationStarted, //Proposal start
         ProposalsRegistrationEnded, //Proposal end
         VotingSessionStarted, // Voting session start
         VotingSessionEnded, // Voting session end
         VotesTallied // Calculate winner
     }
-
-    WorkflowStatus voteStatus;
-
-    uint winningProposalId; //Winning proposal Id
-    Proposal winningProposal; // Winning proposal details
-
-    mapping(address => bool) whitelist; // Mapping address -> whitelisted userVo
-    mapping(address => Voter) voters; // Mapping address -> Array vote user
-    Proposal[] proposals; // Array of proposition
 
     modifier checkWhitelisted() {
         //modifier to check whitelisted user
@@ -58,21 +58,30 @@ contract Storage is Ownable {
     }
 
     modifier checkNumberProposals() {
-        //modifier to check input address
+        //modifier to check if there are proposals to vote for
         require(proposals.length > 0, "There is no proposal to vote for");
         _;
     }
 
     modifier checkAddress0(address _address) {
-        //modifier to check if there are proposals > 0
+        //modifier to check input address
         require(_address != address(0), "input address is invalid");
         _;
     }
 
+    modifier checkWinnerIsCalculated() {
+        //modifier to if check winner has been calculated
+        require(
+            voteStatus == WorkflowStatus.VotesTallied,
+            "Winner is not already set"
+        ); //check the Voting status phase
+        _;
+    }
+
     /**
-     * @dev Set vote status to Registering Voters
+     * @dev Set vote status to RegisteringVoters
      */
-    function setVoteStatusRegisteringVoters() public onlyOwner {
+    function setVoteStatusRegisteringVoters() external onlyOwner {
         require(voteStatus == WorkflowStatus.RegisteringVoters);
         WorkflowStatus voteStatusTemp = voteStatus; //keep temporary previous vote status
         voteStatus = WorkflowStatus.RegisteringVoters; //save new voting status
@@ -80,9 +89,9 @@ contract Storage is Ownable {
     }
 
     /**
-     * @dev Set vote status to Proposal Registration start
+     * @dev Set vote status to ProposalRegistrationstart
      */
-    function setVoteStatusProposalsRegistrationStarted() public onlyOwner {
+    function setVoteStatusProposalsRegistrationStarted() external onlyOwner {
         require(voteStatus == WorkflowStatus.RegisteringVoters);
         WorkflowStatus voteStatusTemp = voteStatus; //keep temporary previous vote status
         voteStatus = WorkflowStatus.ProposalsRegistrationStarted; //save new voting status
@@ -90,13 +99,9 @@ contract Storage is Ownable {
     }
 
     /**
-     * @dev Set vote status to Proposal Registration end
+     * @dev Set vote status to ProposalRegistrationEnd
      */
-    function setVoteStatusProposalsRegistrationEnded()
-        public
-        checkNumberProposals
-        onlyOwner
-    {
+    function setVoteStatusProposalsRegistrationEnded() external onlyOwner {
         //check if there is at least on proposal
         require(voteStatus == WorkflowStatus.ProposalsRegistrationStarted);
         WorkflowStatus voteStatusTemp = voteStatus; //keep temporary previous vote status
@@ -105,9 +110,13 @@ contract Storage is Ownable {
     }
 
     /**
-     * @dev Set vote status to Voting Session Start
+     * @dev Set vote status to VotingSessionStart
      */
-    function setVoteStatusVotingSessionStarted() public onlyOwner {
+    function setVoteStatusVotingSessionStarted()
+        external
+        checkNumberProposals
+        onlyOwner
+    {
         require(voteStatus == WorkflowStatus.ProposalsRegistrationEnded);
         WorkflowStatus voteStatusTemp = voteStatus; //keep temporary previous vote status
         voteStatus = WorkflowStatus.VotingSessionStarted; //save new voting status
@@ -115,10 +124,9 @@ contract Storage is Ownable {
     }
 
     /**
-     * @dev Set vote status to Voting Session Ended
+     * @dev Set vote status to VotingSessionEnded
      */
-    function setVoteStatusVotingSessionEnded() public onlyOwner {
-        //verifier qu'il y a eu au moins 1 vote
+    function setVoteStatusVotingSessionEnded() external onlyOwner {
         require(voteStatus == WorkflowStatus.VotingSessionStarted);
         WorkflowStatus voteStatusTemp = voteStatus; //keep temporary previous vote status
         voteStatus = WorkflowStatus.VotingSessionEnded; //save new voting status
@@ -126,7 +134,7 @@ contract Storage is Ownable {
     }
 
     /**
-     * @dev Set vote status to Votes Tallied
+     * @dev Set vote status to VotesTallied
      */
     function setVoteStatusVotesTallied() private onlyOwner {
         require(voteStatus == WorkflowStatus.VotingSessionEnded);
@@ -137,9 +145,9 @@ contract Storage is Ownable {
 
     /**
      * @dev get actual vote status
-     * @return voteStatus
+     * return voteStatus
      */
-    function getVoteStatus() public view returns (WorkflowStatus) {
+    function getVoteStatus() external view onlyOwner returns (WorkflowStatus) {
         return voteStatus;
     }
 
@@ -149,13 +157,12 @@ contract Storage is Ownable {
      */
     function authorize(
         address _address
-    ) public checkAddress0(_address) onlyOwner {
+    ) external checkAddress0(_address) onlyOwner {
         require(
             voteStatus == WorkflowStatus.RegisteringVoters,
             "Registration Phase is not set"
         ); //check the Voting status phase
         require(!whitelist[_address], "User already whitelisted"); //check already whitelisted user
-        //verifier que l'addresse n'est pas l'address 0
         whitelist[_address] = true; //whitelist user
         voters[_address].isRegistered = true; //"whitelist" user in Voter struct
         emit VoterRegistered(_address); // Send event
@@ -165,14 +172,29 @@ contract Storage is Ownable {
      * @dev add new proposal
      * @param _description of the proposal
      */
-    function proposal(string memory _description) public checkWhitelisted {
-        //tester si la proposaition (_description) existe deja
+    function proposal(string memory _description) external checkWhitelisted {
         require(
             voteStatus == WorkflowStatus.ProposalsRegistrationStarted,
             "Proposals are not allowed during this step"
         ); //check the Voting status phase
-        proposals.push(Proposal(_description, 0)); //add proposal to the list of proposals
-        emit ProposalRegistered(proposals.length - 1); //send event
+
+        bool proposalExist;
+        for (uint i = 0; i < proposals.length; i++) {
+            //check if proposal description already exists
+            if (
+                keccak256(abi.encodePacked(proposals[i].description)) ==
+                keccak256(abi.encodePacked(_description))
+            ) {
+                proposalExist = true;
+            }
+        }
+
+        if (!proposalExist) {
+            proposals.push(Proposal(_description, 0)); //add the proposal to the list of proposals
+            emit ProposalRegistered(proposals.length - 1); //send event
+        } else {
+            revert Voting__ProposalAlreadyExists();
+        }
     }
 
     /**
@@ -181,14 +203,14 @@ contract Storage is Ownable {
      */
     function vote(
         uint proposalId
-    ) public checkNumberProposals checkWhitelisted {
+    ) external checkNumberProposals checkWhitelisted {
         require(
             voteStatus == WorkflowStatus.VotingSessionStarted,
             "Vote phase is not launch"
         ); //check the Voting status phase
         require(!voters[msg.sender].hasVoted, "You have already voted"); //check is user has already voted
         require(
-            proposalId < proposals.length,
+            proposalId < proposals.length && proposalId >= 0,
             "No proposal for this proposal id"
         ); // check if proposal Id exists
 
@@ -204,19 +226,18 @@ contract Storage is Ownable {
      * @dev calculate the winner of the vote
      *  save winner proposal id and winner proposal
      */
-    function calculateWinner() public onlyOwner {
+    function calculateWinner() external onlyOwner {
         require(
             voteStatus == WorkflowStatus.VotingSessionEnded,
             "Voted session has not ended"
         ); //check the Voting status phase
-        //verifier qu'il y a eu des votes
 
         if (proposals.length == 1) {
-            //if only one proposal, return this proposal
+            //if only one proposal, return this proposal => Optimisation of gaz cost computation ?
             winningProposalId = 0;
             winningProposal = proposals[0];
         } else {
-            //else, calculate winner, if draw, we take first proposal in proposal array
+            //else, calculate winner, if draw, we take first proposal in proposal array order
             uint BiggestVoteTmp;
             uint ProposalWinnerIdTmp;
 
@@ -236,12 +257,12 @@ contract Storage is Ownable {
     /**
      * @dev get vote from a participant (_address)
      * @param _address to get vote from
-     * @return proposal detail from user
+     * return proposal detail from user
      */
     function getVoteFromParticipant(
         address _address
     )
-        public
+        external
         view
         checkAddress0(_address)
         checkWhitelisted
@@ -249,33 +270,35 @@ contract Storage is Ownable {
     {
         require(
             voteStatus == WorkflowStatus.VotesTallied,
-            "You cas see votes from voters only when vote phase is closed"
+            "You can see votes from voters only when vote phase is closed"
         );
-        require(voters[_address].hasVoted, "User picked hasn't vote"); //check user picked has already voted
+        require(voters[_address].hasVoted, "User picked hasn't vote"); //check user picked has voted
         return proposals[voters[_address].votedProposalId];
     }
 
     /**
      * @dev get winner details
-     * @return save winner proposal id and winner proposal
+     * return  winner proposal id and winner proposal
      */
-    function getWinnerDetail() public view returns (Proposal memory) {
-        require(
-            voteStatus == WorkflowStatus.VotesTallied,
-            "Winner is not already set"
-        ); //check the Voting status phase
-        return winningProposal;
+    function getWinnerDetail()
+        public
+        view
+        checkWinnerIsCalculated
+        returns (Proposal memory)
+    {
+        return winningProposal; //return winning proposal
     }
 
     /**
      * @dev get winner name
-     * @return winner name
+     * return winner name
      */
-    function getWinner() public view returns (string memory) {
-        require(
-            voteStatus == WorkflowStatus.VotesTallied,
-            "Winner is not already set"
-        ); //check the Voting status phase
-        return winningProposal.description; //return winning description proposal
+    function getWinner()
+        external
+        view
+        checkWinnerIsCalculated
+        returns (string memory)
+    {
+        return getWinnerDetail().description;
     }
 }
