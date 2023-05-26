@@ -9,19 +9,16 @@ pragma solidity 0.8.20;
 
 import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol";
 
-error Voting__ProposalAlreadyExists();
+error Voting__ProposalAlreadyExists(); //error if a proposal already exists
 
 contract Voting is Ownable {
-    //constructor() Ownable() {}
-
     uint winningProposalId; //Winning proposal Id
     Proposal winningProposal; // Winning proposal details
 
-    WorkflowStatus voteStatus; // Actual status of voting stage
+    WorkflowStatus voteStatus; // Current voting stage status
 
-    mapping(address => bool) whitelist; // Mapping address -> whitelisted users
-    mapping(address => Voter) voters; // Mapping address ->  voter struct
-    Proposal[] proposals; // Array of proposal
+    mapping(address => Voter) voters; // Mapping address ->  voter
+    Proposal[] proposals; // Array of proposals
 
     event VoterRegistered(address voterAddress); // event when a voter is whitelisted
     event WorkflowStatusChange(
@@ -38,8 +35,8 @@ contract Voting is Ownable {
     }
 
     struct Proposal {
-        string description; //proposal'a description
-        uint voteCount; // vote count for the proposal
+        string description; //proposal's description
+        uint voteCount; // vote counter for the proposal
     }
 
     enum WorkflowStatus {
@@ -53,7 +50,7 @@ contract Voting is Ownable {
 
     modifier checkWhitelisted() {
         //modifier to check whitelisted user
-        require(whitelist[msg.sender] == true, "You are not whitelisted");
+        require(voters[msg.sender].isRegistered, "You are not whitelisted");
         _;
     }
 
@@ -70,7 +67,7 @@ contract Voting is Ownable {
     }
 
     modifier checkWinnerIsCalculated() {
-        //modifier to if check winner has been calculated
+        //modifier to if check winner has been calculated by Owner
         require(
             voteStatus == WorkflowStatus.VotesTallied,
             "Winner is not already set"
@@ -111,6 +108,7 @@ contract Voting is Ownable {
 
     /**
      * @dev Set vote status to VotingSessionStart
+     * We can't launch Voting session if there are no proposal -> checkNumberProposals
      */
     function setVoteStatusVotingSessionStarted()
         external
@@ -162,8 +160,8 @@ contract Voting is Ownable {
             voteStatus == WorkflowStatus.RegisteringVoters,
             "Registration Phase is not set"
         ); //check the Voting status phase
-        require(!whitelist[_address], "User already whitelisted"); //check already whitelisted user
-        whitelist[_address] = true; //whitelist user
+        require(!voters[_address].isRegistered, "User already whitelisted"); //check already whitelisted user
+        //whitelist[_address] = true; //whitelist user
         voters[_address].isRegistered = true; //"whitelist" user in Voter struct
         emit VoterRegistered(_address); // Send event
     }
@@ -209,11 +207,12 @@ contract Voting is Ownable {
             "Vote phase is not launch"
         ); //check the Voting status phase
         require(!voters[msg.sender].hasVoted, "You have already voted"); //check is user has already voted
-        require(
+
+        /*require(
             proposalId < proposals.length && proposalId >= 0,
             "No proposal for this proposal id"
         ); // check if proposal Id exists
-
+*/
         proposals[proposalId].voteCount++; //Increment counter for this proposal
 
         voters[msg.sender].hasVoted = true; //set the voter has voted
@@ -257,7 +256,7 @@ contract Voting is Ownable {
     /**
      * @dev get vote from a participant (_address)
      * @param _address to get vote from
-     * return proposal detail from user
+     * return proposal detail vote from a user
      */
     function getVoteFromParticipant(
         address _address
