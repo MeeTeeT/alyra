@@ -4,7 +4,7 @@ pragma solidity 0.8.20;
 
 /**
  * @title Voting
- * @dev Voting system with whitelisted participants and participants proposals
+ * @dev Voting system with whitelisted voters and voters proposals
  */
 
 import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol";
