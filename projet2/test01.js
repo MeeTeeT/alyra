@@ -91,7 +91,7 @@ expectEvent(result, 'finalResults', {
   it("startProposalsRegistering() => check workflowStatus change", async () => {
    
     let workflowStatutBeforeChange = await MyVotingInstance.workflowStatus();
-    console.log("before change",workflowStatutBeforeChange.words[0]);
+    //console.log("before change",workflowStatutBeforeChange.words[0]);
     assert.equal(workflowStatutBeforeChange.words[0], new BN(0), 'Status should be 0');
 
     await MyVotingInstance.startProposalsRegistering({ from: _owner });
@@ -163,7 +163,7 @@ expectEvent(result, 'finalResults', {
    await MyVotingInstance.startProposalsRegistering({ from: _owner });
 
     let workflowStatutBeforeChange = await MyVotingInstance.workflowStatus();
-    console.log("before change",workflowStatutBeforeChange.words[0]);
+    //console.log("before change",workflowStatutBeforeChange.words[0]);
     assert.equal(workflowStatutBeforeChange.words[0], new BN(1), 'Status should be 1');
 
     await MyVotingInstance.endProposalsRegistering({ from: _owner });
@@ -203,7 +203,7 @@ expectEvent(result, 'finalResults', {
     await MyVotingInstance.endProposalsRegistering({ from: _owner });
 
     let workflowStatutBeforeChange = await MyVotingInstance.workflowStatus();
-    console.log("before change",workflowStatutBeforeChange.words[0]);
+    //console.log("before change",workflowStatutBeforeChange.words[0]);
     assert.equal(workflowStatutBeforeChange.words[0], new BN(2), 'Status should be 2');
 
     await MyVotingInstance.startVotingSession({ from: _owner });
@@ -267,24 +267,24 @@ it("setVote() => check vote storage in voters struct and in proposal array", asy
 
   //Check vote value in voter struct before vote
   let valueBeforeVote = (await MyVotingInstance.getVoter(_voter1,{from: _voter1})).votedProposalId;
-  console.log("value before vote",valueBeforeVote);
+  //console.log("value before vote",valueBeforeVote);
   assert.equal(valueBeforeVote, new BN(0), 'proposal id should be 0');
 
    //check count vote in proposals array before vote
    let countValueBeforeVote = (await MyVotingInstance.getOneProposal(new BN(1),{from: _voter1})).voteCount;
-   console.log("value before vote in proposal array",countValueBeforeVote);
+   //console.log("value before vote in proposal array",countValueBeforeVote);
    assert.equal(countValueBeforeVote, new BN(0), 'counter vote should be 0');
  
   await MyVotingInstance.setVote(new BN(1), {from: _voter1});
 
   //Check vote value in voter struct after vote
   let valueAfterVote = (await MyVotingInstance.getVoter(_voter1,{from: _voter1})).votedProposalId;
-  console.log("value after vote",valueAfterVote);
+  //console.log("value after vote",valueAfterVote);
   assert.equal(valueAfterVote, new BN(1), 'proposal id should be 1');
 
   //check count vote in proposals array after vote
   let countValueAfterVote = (await MyVotingInstance.getOneProposal(new BN(1),{from: _voter1})).voteCount;
-  console.log("value after vote in proposal array",countValueAfterVote);
+  //console.log("value after vote in proposal array",countValueAfterVote);
   assert.equal(countValueAfterVote, new BN(1), 'counter vote should be 1');
 
 });
@@ -326,7 +326,7 @@ it("endVotingSession() => check workflowStatus change", async () => {
   await MyVotingInstance.startVotingSession({from: _owner})
 
   let workflowStatutBeforeChange = await MyVotingInstance.workflowStatus();
-  console.log("before change",workflowStatutBeforeChange.words[0]);
+  //console.log("before change",workflowStatutBeforeChange.words[0]);
   assert.equal(workflowStatutBeforeChange.words[0], new BN(3), 'Status should be 3');
 
   await MyVotingInstance.endVotingSession({ from: _owner });
@@ -365,7 +365,7 @@ console.log("***********************************");
   await expectRevert(MyVotingInstance.tallyVotes({from: _owner}), "Current status is not voting session ended");
 });
  //check vote count et winning id
- it("tallyVotes() => check vote winning id status", async () => {
+ it("tallyVotes() => check vote winning id", async () => {
   await MyVotingInstance.addVoter(_voter1, {from: _owner}); 
   await MyVotingInstance.addVoter(_voter2, {from: _owner});
   await MyVotingInstance.addVoter(_voter3, {from: _owner}); 
@@ -384,8 +384,8 @@ console.log("***********************************");
   await MyVotingInstance.tallyVotes({from: _owner});
 
   const winnindId = await MyVotingInstance.winningProposalID();
-
-  assert.equal(winnindId, new BN(2), 'Status should be 2');
+  //console.log("winner : ",winnindId.words[0]);
+  assert.equal(winnindId.words[0], new BN(2), 'Status should be 2');
 
 });
  
@@ -397,7 +397,7 @@ it("tallyVotes() => check workflowStatus change", async () => {
   await MyVotingInstance.endVotingSession({from: _owner});
 
   let workflowStatutBeforeChange = await MyVotingInstance.workflowStatus();
-  console.log("before change",workflowStatutBeforeChange.words[0]);
+  //console.log("before change",workflowStatutBeforeChange.words[0]);
   assert.equal(workflowStatutBeforeChange.words[0], new BN(4), 'Status should be 4');
 
   await MyVotingInstance.tallyVotes({ from: _owner });
@@ -412,83 +412,12 @@ it("tallyVotes() => check event tallyVotes", async () => {
   await MyVotingInstance.startProposalsRegistering({ from: _owner });
   await MyVotingInstance.endProposalsRegistering({ from: _owner });
   await MyVotingInstance.startVotingSession({ from: _owner });
-  const result = await MyVotingInstance.endVotingSession({ from: _owner });
-  await MyVotingInstance.tallyVotes({from: _owner});
+  await MyVotingInstance.endVotingSession({ from: _owner });
+  const result = await MyVotingInstance.tallyVotes({from: _owner});
   expectEvent(result, 'WorkflowStatusChange', {
     previousStatus: new BN(4),newStatus:new BN(5)
   });
  });
 
 
-
-
-
-
-
-
-/*
-  it("has a name", async () => {
-    expect(await MyTokenInstance.name()).to.equal(_name);
-  });
-
-  it("has a symbol", async () => {
-    expect(await MyTokenInstance.symbol()).to.equal(_symbol);
-  });
-
-  it("has a decimal", async () => {
-    expect(await MyTokenInstance.decimals()).to.be.bignumber.equal(_decimal);
-  });
-
-  it("check first balance", async () => {
-    expect(await MyTokenInstance.balanceOf(_owner)).to.be.bignumber.equal(_initialSupply);
-  });
-
-  it("check balance after transfer", async () => {
-    let amount = new BN(100);
-    let balanceOwnerBeforeTransfer = await MyTokenInstance.balanceOf(_owner);
-    let balanceRecipientBeforeTransfer = await MyTokenInstance.balanceOf(_recipient)
-
-    expect(balanceRecipientBeforeTransfer).to.be.bignumber.equal(new BN(0));
-    
-    await MyTokenInstance.transfer(_recipient, new BN(100), {from: _owner});
-
-    let balanceOwnerAfterTransfer = await MyTokenInstance.balanceOf(_owner);
-    let balanceRecipientAfterTransfer = await MyTokenInstance.balanceOf(_recipient)
-
-    expect(balanceOwnerAfterTransfer).to.be.bignumber.equal(balanceOwnerBeforeTransfer.sub(amount));
-    expect(balanceRecipientAfterTransfer).to.be.bignumber.equal(balanceRecipientBeforeTransfer.add(amount));
-  });
-
-  
-  it("check if approval done", async () => {
-    let amount = new BN(100);
-    let AllowanceBeforeApproval = await MyTokenInstance.allowance(_owner, _recipient);
-    expect(AllowanceBeforeApproval).to.be.bignumber.equal(new BN(0));
-
-    await MyTokenInstance.approve(_recipient, amount);
-    
-    let AllowanceAfterApproval = await MyTokenInstance.allowance(_owner, _recipient);
-    expect(AllowanceAfterApproval).to.be.bignumber.equal(amount);
-  });
-
-    
-  it("check if transferFrom done", async () => {
-    let amount = new BN(100);
-    
-    await MyTokenInstance.approve(_recipient, amount);
-
-    let balanceOwnerBeforeTransfer = await MyTokenInstance.balanceOf(_owner);
-    let balanceRecipientBeforeTransfer = await MyTokenInstance.balanceOf(_recipient)
-    expect(balanceOwnerBeforeTransfer).to.be.bignumber.equal(_initialSupply);
-    expect(balanceRecipientBeforeTransfer).to.be.bignumber.equal(new BN(0));
-
-    await MyTokenInstance.transferFrom(_owner, _recipient, amount, { from: _recipient})
-
-    let balanceOwnerAfterTransfer = await MyTokenInstance.balanceOf(_owner);
-    let balanceRecipientAfterTransfer = await MyTokenInstance.balanceOf(_recipient)
-
-    expect(balanceOwnerAfterTransfer).to.be.bignumber.equal(balanceOwnerBeforeTransfer.sub(amount));
-    expect(balanceRecipientAfterTransfer).to.be.bignumber.equal(balanceRecipientBeforeTransfer.add(amount));
-  });
-  */
 });
