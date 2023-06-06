@@ -33,7 +33,7 @@ Description des tests :
     *                Enregistrement des votants                *
     ************************************************************
 
-    - "Describe : Check function addVoter()" =>
+    - "Describe : Check function addVoter()"
         ✔ addVoter() => check require owner
         ✔ addVoter() => check require workflowStatus
         ✔ addVoter() => check already register
@@ -93,7 +93,7 @@ Description des tests :
     *         Vote des utilisateurs enregistrés (2/2)          *
     ************************************************************
 
-    - "Describe : Check function setVote()"  => Vote des utilisateurs enregistrés (2/2)
+    - "Describe : Check function setVote()"
         ✔ setVote() => check input id is Ok
         ✔ setVote() => check vote storage in voters struct and in proposal array
         ✔ setVote() => check event
