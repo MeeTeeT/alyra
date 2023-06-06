@@ -4,9 +4,13 @@ Explication des tests unitaires :
 
 1 - Les tests unitaires sont regroupés dans des "describes". Ces regroupements ont été réalisés par "fonction" du smart contract en essayant de regrouper les tests qui necessitent les mêmes "beforeEach"
 
-2 - Pour chaque fonction, vérification : - Des "require" - Des calculs & stockage des informations - De la bonne execution des fonctions avec la vérification des events
+2 - Pour chaque fonction, vérification :
 
-2 - Execution des tests unitaires en suivant les étapes d'éxecution du Workflow
+    - Des "require"
+    - Des calculs & stockage des informations
+    - De la bonne execution des fonctions avec la vérification des events
+
+3 - Execution des tests unitaires en suivant les étapes d'éxecution du Workflow
 
     - "Describe : Smart contract initialization" => Publication du Smart contract
         ✔ check owner of the smart contract is the deployer
