@@ -286,6 +286,7 @@ describe("Check function addVoter()", function() {
  //check require : Check caller is the owner
  it("setVote() => check require onlyVoters", async () => {
   await MyVotingInstance.addVoter(_voter1, { from: _owner }); //register a voter
+  //const result = await MyVotingInstance.startProposalsRegistering({ from: _owner }); //start proposal sesssion
   await expectRevert(MyVotingInstance.setVote(new BN(1), {from: _voter2}), "You're not a voter");
 });
 
