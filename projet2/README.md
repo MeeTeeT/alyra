@@ -1,6 +1,13 @@
 # alyra
 
-Tests unitaires réalisés avec Truffle :
+|-------------------------------------------
+| Fichier d'explication Tests Unitaires
+|-------------------------------------------
+| Smart Contract testé : Voting.sol
+| Environnement : Truffle
+|-------------------------------------------
+
+Description des tests :
 
 1 - Les tests unitaires sont regroupés dans des "describes". Ces regroupements ont été réalisés par "fonction" du smart contract en essayant de regrouper les tests qui necessitent les mêmes "beforeEach"
 
