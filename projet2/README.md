@@ -1,6 +1,6 @@
 # alyra
 
-Explication des tests unitaires :
+Tests unitaires réalisés avec Truffle :
 
 1 - Les tests unitaires sont regroupés dans des "describes". Ces regroupements ont été réalisés par "fonction" du smart contract en essayant de regrouper les tests qui necessitent les mêmes "beforeEach"
 
