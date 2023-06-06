@@ -89,7 +89,7 @@ Description des tests :
         ✔ setVote() => check require status
         ✔ setVote() => check voter has already voted
 
-     ************************************************************
+    ************************************************************
     *         Vote des utilisateurs enregistrés (2/2)          *
     ************************************************************
 
