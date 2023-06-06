@@ -12,57 +12,97 @@ Explication des tests unitaires :
 
 3 - Execution des tests unitaires en suivant les étapes d'éxecution du Workflow
 
-    - "Describe : Smart contract initialization" => Publication du Smart contract
+    ************************************************************
+    *            Publication du Smart contract                 *
+    ************************************************************
+
+    - "Describe : Smart contract initialization" =>
         ✔ check owner of the smart contract is the deployer
 
-    - "Describe : Check function addVoter()" => Enregistrement des votants
+    ************************************************************
+    *                Enregistrement des votants                *
+    ************************************************************
+
+    - "Describe : Check function addVoter()" =>
         ✔ addVoter() => check require owner
         ✔ addVoter() => check require workflowStatus
         ✔ addVoter() => check already register
         ✔ addVoter() => check addVoter registered the voter
         ✔ addVoter() => check event VoterRegistered
 
-    - "Describe : Check function startProposalsRegistering()" => Ouverture des propositions
+    ************************************************************
+    *                Ouverture des propositions                *
+    ************************************************************
+
+    - "Describe : Check function startProposalsRegistering()"
         ✔ startProposalsRegistering() => check require owner
         ✔ startProposalsRegistering() => check require workflowStatus
         ✔ startProposalsRegistering() => check workflowStatus change
         ✔ startProposalsRegistering() => check event startProposalsRegistering
 
-    - "Describe : Check function addProposal()" => Enregistrement des propositions par les utilisateurs enregistrés
+    ************************************************************
+    *            Enregistrement des propositions               *
+    ************************************************************
+
+    - "Describe : Check function addProposal()"
         ✔ addProposal() => check require onlyVoters
         ✔ addProposal() => check require empty proposal
         ✔ addProposal() => check proposal storage
         ✔ addProposal() => check event ProposalRegistered
 
-    - "Describe : Check function ProposalsRegistrationEnded()" => Fermetures de propositions
+    ************************************************************
+    *                Fermetures de propositions                *
+    ************************************************************
+
+    - "Describe : Check function ProposalsRegistrationEnded()"
         ✔ ProposalsRegistrationEnded() => check require owner
         ✔ ProposalsRegistrationEnded() => check require workflowStatus
         ✔ ProposalsRegistrationEnded() => check workflowStatus change
         ✔ ProposalsRegistrationEnded() => check event ProposalsRegistrationEnded
 
-    - "Describe : Check function startVotingSession()" => Ouverture des votes
+    ************************************************************
+    *                     Ouverture des votes                  *
+    ************************************************************
+
+    - "Describe : Check function startVotingSession()"
         ✔ startVotingSession() => check require owner
         ✔ startVotingSession() => check require workflowStatus
         ✔ startVotingSession() => check workflowStatus change
         ✔ startVotingSession() => check event startVotingSession
 
-    - "Describe : Check require of function setVote()" => Vote des utilisateurs enregistrés (1/2)
+    ************************************************************
+    *         Vote des utilisateurs enregistrés (1/2)          *
+    ************************************************************
+
+    - "Describe : Check require of function setVote()"
         ✔ setVote() => check require onlyVoters
         ✔ setVote() => check require status
         ✔ setVote() => check voter has already voted
+
+     ************************************************************
+    *         Vote des utilisateurs enregistrés (2/2)          *
+    ************************************************************
 
     - "Describe : Check function setVote()"  => Vote des utilisateurs enregistrés (2/2)
         ✔ setVote() => check input id is Ok
         ✔ setVote() => check vote storage in voters struct and in proposal array
         ✔ setVote() => check event
 
-    - "Describe : Check function endVotingSession()" => Fermeture des votes
+    ************************************************************
+    *                    Fermeture des votes                   *
+    ************************************************************
+
+    - "Describe : Check function endVotingSession()"
         ✔ endVotingSession() => check require owner
         ✔ endVotingSession() => check require workflowStatus
         ✔ endVotingSession() => check workflowStatus change
         ✔ endVotingSession() => check event endVotingSession
 
-    - "Describe : Check function tallyVotes()" => Calcul du gagnant
+    ************************************************************
+    *                     Calcul du gagnant                    *
+    ************************************************************
+
+    - "Describe : Check function tallyVotes()"
         ✔ tallyVotes() => check require owner
         ✔ tallyVotes() => check require status
         ✔ tallyVotes() => check vote winning id
