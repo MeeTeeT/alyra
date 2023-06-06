@@ -5,6 +5,7 @@
 ---
 
 Smart Contract testé : Voting.sol
+
 Environnement : Truffle
 
 ---
