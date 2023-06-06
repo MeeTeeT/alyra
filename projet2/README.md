@@ -1,11 +1,13 @@
 # alyra
 
-|-------------------------------------------
-| Fichier d'explication Tests Unitaires
-|-------------------------------------------
-| Smart Contract testé : Voting.sol
-| Environnement : Truffle
-|-------------------------------------------
+---
+
+## Fichier d'explication Tests Unitaires
+
+Smart Contract testé : Voting.sol
+Environnement : Truffle
+
+---
 
 Description des tests :
 
