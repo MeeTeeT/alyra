@@ -43,7 +43,7 @@ J'ai utilisé truffle et je n'ai pas accès au calcul du coverage. Je ne peux pa
     ************************************************************
 
     - "Describe : Check function addVoter()"
-        ✔ addVoter() => Check require
+      addVoter() => Check require
         ✓ addVoter() => check require owner
         ✓ addVoter() => check require workflowStatus  (94840 gas)
         ✓ addVoter() => check already register (50220 gas)
