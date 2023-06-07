@@ -8,6 +8,8 @@ Smart Contract testé : Voting.sol
 
 Environnement : Truffle
 
+Cas testé : 39 tests unitaires
+
 ---
 
 Description des tests :
