@@ -128,6 +128,14 @@ describe("Check function startProposalsRegistering()", function() {
       await expectRevert(MyVotingInstance.startProposalsRegistering({from: _owner}), "Registering proposals cant be started now");
     });
 
+    //check genesis block
+    it("startProposalsRegistering() => check genesis block ", async () => {
+      await MyVotingInstance.addVoter(_voter1, { from: _owner });
+      await MyVotingInstance.startProposalsRegistering({from: _owner}); 
+      let DescriptionGenesis = (await MyVotingInstance.getOneProposal(0, {from: _voter1})).description;
+      expect(DescriptionGenesis).to.equal("GENESIS");
+    });
+
     //check status change
     //description : we get initial status, then we execute function, and we check the new status
     it("startProposalsRegistering() => check workflowStatus change", async () => {
@@ -351,8 +359,10 @@ describe("Check function ProposalsRegistrationEnded()", function() {
     context("setVote() => Check function", function(){
 
       //check input ne depasse pas le tab
-      it("setVote() => check input id is Ok", async () => {});
-
+      it("setVote() => check input id is Ok", async () => {
+        await expectRevert(MyVotingInstance.setVote(new BN(2), {from: _voter1}), "Proposal not found"); // check id > proposal array
+      });
+      
       //check setvote storage (counter and proposalId)
       //description : check proposalId and count from a voter before vote
       //              then execute setVote and check proposalId and count after vote

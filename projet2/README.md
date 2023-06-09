@@ -21,7 +21,7 @@ Pour les fonctions de "traitements" (= toutes les fonctions à l'exclusion des f
 
 Difficultés rencontrées au niveau de la factorisation du code :
 J'ai essayé de factoriser le plus possible de code dans des "beforeEach", qui se trouvent soit au niveau des "subscribe", soit au niveau des "context".
-Ma difficulté réside dans le fait que dans toutes mes fonctions, j'ai un test sur le statut du workflow que je fais en fixant exprès un mauvais statut pour vérifier qu'un revert se fait bien. Mais cette fixation de statut m'empeche de factoriser du code plus haut dans les 'foreach' en allant jusqu'au statut approprié du wkf.
+Ma difficulté réside dans le fait que dans de nombreuses fonctions, j'ai un test sur le statut du workflow que je fais en fixant exprès un mauvais statut pour vérifier qu'un revert se fait bien. Mais cette fixation de statut m'empeche de factoriser du code plus haut dans les 'foreach' en allant jusqu'au statut approprié du wkf.
 
 3 - Pour chaque fonction, vérification :
 
@@ -30,8 +30,19 @@ Ma difficulté réside dans le fait que dans toutes mes fonctions, j'ai un test 
     - De la bonne execution des fonctions avec la vérification des events
 
 4 - Coverage :
-J'ai utilisé truffle et je n'ai pas accès au calcul du coverage. Je ne peux pas le vérifier.
-(manque de temps pour me refaire une config hardhat avec modif du code associé)
+J'ai utilisé truffle et j'ai transféré sur hardhat pour calculer le coverage :
+(Malheureusement, je n'ai pas le temps pour améliorer mes tests pour couvrir un 100% de coverage) :
+
+-------------|----------|----------|----------|----------|----------------|
+File ........| % Stmts .| % Branch | % Funcs .| % Lines |Uncovered Lines |
+-------------|----------|----------|----------|----------|----------------|
+..contracts/ | 100 .....| 91.67 ...| 100 .....| 100 .....| |
+..Voting.sol | 100 .....| 91.67 ...| 100 .....| 100 .....| |
+-------------|----------|----------|----------|----------|----------------|
+...All files | 100 .....| 91.67 ...| 100 .....| 100 .....| |
+-------------|----------|----------|----------|----------|----------------|
+
+5 - Les tests unitaires sont documentés à l'interieur du script de test unitaire en lui même
 
     ************************************************************
     *            Publication du Smart contract                 *
@@ -47,8 +58,8 @@ J'ai utilisé truffle et je n'ai pas accès au calcul du coverage. Je ne peux pa
     - "Describe : Check function addVoter()"
       addVoter() => Check require
         ✓ addVoter() => check require owner
-        ✓ addVoter() => check require workflowStatus  (94840 gas)
-        ✓ addVoter() => check already register (50220 gas)
+        ✓ addVoter() => check require workflowStatus
+        ✓ addVoter() => check already register
       addVoter() => Check function
         ✓ addVoter() => check addVoter storage isRegistered
         ✓ addVoter() => check addVoter storage hasVoted
@@ -75,7 +86,7 @@ J'ai utilisé truffle et je n'ai pas accès au calcul du coverage. Je ne peux pa
         ✓ addProposal() => check require onlyVoters
         ✓ addProposal() => check require empty proposal
       addProposal() => Check function
-        ✓ addProposal() => check proposal storage (59052 gas)
+        ✓ addProposal() => check proposal storage
       addProposal() => Check event
         ✓ addProposal() => check event ProposalRegistered
 
@@ -105,12 +116,12 @@ J'ai utilisé truffle et je n'ai pas accès au calcul du coverage. Je ne peux pa
 
     - "Describe : Check require of function setVote()"
       setVote() => Check require
-        ✓ setVote() => check require onlyVoters (50220 gas)
-        ✓ setVote() => check require status (175659 gas)
-        ✓ setVote() => check voter has already voted (264314 gas)
+        ✓ setVote() => check require onlyVoters
+        ✓ setVote() => check require status
+        ✓ setVote() => check voter has already voted
       setVote() => Check function
         ✓ setVote() => check input id is Ok
-        ✓ setVote() => check vote storage in voters struct and in proposal array (78013 gas)
+        ✓ setVote() => check vote storage in voters struct and in proposal array
       setVote() => Check event
         ✓ setVote() => check event
 
@@ -131,9 +142,9 @@ J'ai utilisé truffle et je n'ai pas accès au calcul du coverage. Je ne peux pa
     - "Describe : Check function tallyVotes()"
       tallyVotes() => Check require
         ✓ tallyVotes() => check require owner
-        ✓ tallyVotes() => check require status (155993 gas)
+        ✓ tallyVotes() => check require status
       tallyVotes() => Check function
-        ✓ tallyVotes() => check vote winning id (797734 gas)
-        ✓ tallyVotes() => check workflowStatus change (224375 gas)
+        ✓ tallyVotes() => check vote winning id
+        ✓ tallyVotes() => check workflowStatus change
       tallyVotes() => Check event
         ✓ tallyVotes() => check event tallyVotes
