@@ -39,7 +39,7 @@ Ma difficulté réside dans le fait que dans de nombreuses fonctions, j'ai un te
 
 **4 - Coverage :**
 
-J'ai utilisé truffle et j'ai transféré sur hardhat pour calculer le coverage :
+J'ai utilisé truffle et j'ai transféré sur hardhat pour calculer le coverage :  
 (Malheureusement, je n'ai pas le temps pour améliorer mes tests pour couvrir un 100% de coverage) :
 
 ```
@@ -53,7 +53,7 @@ All files    |      100 |    91.67 |      100 |      100 |                |
 -------------|----------|----------|----------|----------|----------------|
 ```
 
-**5 - Les tests unitaires sont documentés à l'interieur du script de test unitaire en lui même**
+**5 - Les tests unitaires sont documentés à l'interieur du script de test unitaire (test01.js) en lui même**
 
 ```
     ************************************************************
