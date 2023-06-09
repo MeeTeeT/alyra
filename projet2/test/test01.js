@@ -16,59 +16,52 @@ contract("Voting", accounts => {
   
   let MyVotingInstance;
 
-  //const storedData = await StorageInstance.voters.call(0x1231);
-  //expect(storedData.votedFor).to.be.bignumber.equal(BN(8));
-  //expect(storedData.hasVoted).to.be.false;
-// expect statut.to.be.equal.be.bugnumber.equal(new BN(X))
-
   //check the deployer of the smart contract is the owner
   describe("Smart contract initialization", function() {
 
-    beforeEach(async function(){
-      MyVotingInstance = await Voting.new({ from: _owner });
-    });
+      before(async function(){
+        MyVotingInstance = await Voting.new({ from: _owner });
+      });
 
-    it('check owner of the smart contract is the deployer', async function() {
-        let theOwner = await MyVotingInstance.owner()
-        const addressDeployer = web3.utils.toChecksumAddress(_owner);
-        const adressOwner = web3.utils.toChecksumAddress(theOwner);
-    
-        expect(addressDeployer).to.equal(adressOwner);
-    })
-})
-
-//utiliser describe puis context faire des pavés dans le describe
+      it('check owner of the smart contract is the deployer', async function() {
+          let theOwner = await MyVotingInstance.owner()
+          const addressDeployer = web3.utils.toChecksumAddress(_owner);
+          const adressOwner = web3.utils.toChecksumAddress(theOwner);
+      
+          expect(addressDeployer).to.equal(adressOwner);
+      })
+  })
 
 //Check function addVoter()
 describe("Check function addVoter()", function() {
 
   beforeEach(async function(){
     MyVotingInstance = await Voting.new({ from: _owner });
-  // console.log("l'adress du owner est ",_owner);
   });
 
   context("addVoter() => Check require", function(){
     
-  //check require : Check caller is the owner
-  it("addVoter() => check require owner", async () => {
-    await expectRevert(MyVotingInstance.addVoter(_voter2, {from: _voter1}), "Ownable: caller is not the owner");
-  });
+      //check require : Check caller is the owner
+      it("addVoter() => check require owner", async () => {
+        await expectRevert(MyVotingInstance.addVoter(_voter2, {from: _voter1}), "Ownable: caller is not the owner");
+      });
 
-  //check require : checker workflowStatus
-  //description : we set the sessions status to a bad status and we check the addVoter() function
-  it("addVoter() => check require workflowStatus ", async () => {
-    await MyVotingInstance.startProposalsRegistering({from: _owner}); //we set the session status to an ineligible status
-    await expectRevert(MyVotingInstance.addVoter(_voter2, {from: _owner}), "Voters registration is not open yet");
-   
-  });
-  
-  //check require : already registrer
-  //description : we registred a voter, and we try to registered this user again
-  it("addVoter() => check already register", async () => {
-    await MyVotingInstance.addVoter(_voter1, { from: _owner });
-    await expectRevert(MyVotingInstance.addVoter(_voter1, {from: _owner}), "Already registered");
-  });
-  })
+      //check require : checker workflowStatus
+      //description : we set the sessions status to a bad status and we check the addVoter() function
+      it("addVoter() => check require workflowStatus ", async () => {
+        await MyVotingInstance.startProposalsRegistering({from: _owner}); //we set the session status to an ineligible status
+        await expectRevert(MyVotingInstance.addVoter(_voter2, {from: _owner}), "Voters registration is not open yet");
+      
+      });
+      
+      //check require : already registrer
+      //description : we registred a voter, and we try to registered this user again
+      it("addVoter() => check already register", async () => {
+        await MyVotingInstance.addVoter(_voter1, { from: _owner });
+        await expectRevert(MyVotingInstance.addVoter(_voter1, {from: _owner}), "Already registered");
+      });
+      })
+
   context("addVoter() => Check function", function(){
 
     beforeEach(async function(){
@@ -76,87 +69,91 @@ describe("Check function addVoter()", function() {
       result = await MyVotingInstance.getVoter(_voter1, {from:_voter1});
     }); 
 
-  //check storage : registered state in Voter struct
-  //description : we register a user, the we call this user and check if it regstered
-  it("addVoter() => check addVoter storage isRegistered ", async () => {
-     
-    expect(result.isRegistered).to.be.true;
-  });
-
-   //check storage : registered state in Voter struct
-  //description : we register a user, the we call this user and check if voted to false
-  it("addVoter() => check addVoter storage hasVoted ", async () => {
-    expect(result.hasVoted).to.be.false;
-  });
-
-   //check storage : registered state in Voter struct
-  //description : we register a user, the we call this user and check if votedProposalId is 0
-  it("addVoter() => check addVoter storage voteProposalId ", async () => {
-     expect(result.votedProposalId).to.be.bignumber.equal(BN(0));
-  });
-});
-context("addVoter() => Check event", function(){
-  beforeEach(async function(){
-    result = await MyVotingInstance.addVoter(_voter1, { from: _owner });
-  }); 
-   //check well execution of addVoter
-   //description : check event
-   it("addVoter() => check event VoterRegistered", async () => {
-    
-    expectEvent(result, 'VoterRegistered', {
-      voterAddress: _voter1
+    //check storage : registered state in Voter struct
+    //description : we register a user, the we call this user and check if it regstered
+    it("addVoter() => check addVoter storage isRegistered ", async () => {
+      expect(result.isRegistered).to.be.true;
     });
-   });
-  });
+
+    //check storage : registered state in Voter struct
+    //description : we register a user, the we call this user and check if voted to false
+    it("addVoter() => check addVoter storage hasVoted ", async () => {
+      expect(result.hasVoted).to.be.false;
+    });
+
+    //check storage : registered state in Voter struct
+    //description : we register a user, the we call this user and check if votedProposalId is 0
+    it("addVoter() => check addVoter storage voteProposalId ", async () => {
+      expect(result.votedProposalId).to.be.bignumber.equal(BN(0));
+    });
+});
+
+context("addVoter() => Check event", function(){
+    beforeEach(async function(){
+      result = await MyVotingInstance.addVoter(_voter1, { from: _owner });
+    }); 
+
+    //check well execution of addVoter
+    //description : check event
+    it("addVoter() => check event VoterRegistered", async () => {
+      expectEvent(result, 'VoterRegistered', {
+      voterAddress: _voter1
+      });
+
+    });
+
+    });
+
 });
 
   // console.log("***********************************");
   // console.log("Check startProposalsRegistering function ");
    
-   describe("Check function startProposalsRegistering()", function() {
+describe("Check function startProposalsRegistering()", function() {
 
     beforeEach(async function(){
       MyVotingInstance = await Voting.new({ from: _owner });
     });
 
     //check require : Check caller is the owner
-   it("startProposalsRegistering() => check require owner", async () => {
-    await expectRevert(MyVotingInstance.startProposalsRegistering({from: _voter1}), "Ownable: caller is not the owner");
-  });
-
-  //check require : checker workflowStatus
-  //description : we set the sessions status to a bad status and we check the startProposalsRegistering() function
-  it("startProposalsRegistering() => check require workflowStatus ", async () => {
-    await MyVotingInstance.startProposalsRegistering({from: _owner}); 
-    await MyVotingInstance.endProposalsRegistering({from: _owner}); //we set the session status to an ineligible status
-    await expectRevert(MyVotingInstance.startProposalsRegistering({from: _owner}), "Registering proposals cant be started now");
-  });
-
-  //check status change
-  //description : we get initial status, then we execute function, and we check the new status
-  it("startProposalsRegistering() => check workflowStatus change", async () => {
-   
-    const workflowStatutBeforeChange = await MyVotingInstance.workflowStatus(); // contract.status.call()
-    expect(workflowStatutBeforeChange.toNumber()).to.equal(0); 
-   
-    await MyVotingInstance.startProposalsRegistering({ from: _owner });
-    
-    let workflowStatusAfterChange = await MyVotingInstance.workflowStatus();
-    expect(workflowStatusAfterChange.toNumber()).to.equal(1); 
- 
-    
-  });
-
-  //check well execution of startProposalsRegistering
-   //description : check event
-  it("startProposalsRegistering() => check event startProposalsRegistering", async () => {
-    const result = await MyVotingInstance.startProposalsRegistering({ from: _owner });
-    expectEvent(result, 'WorkflowStatusChange', {
-      previousStatus: new BN(0),newStatus:new BN(1)
+    it("startProposalsRegistering() => check require owner", async () => {
+      await expectRevert(MyVotingInstance.startProposalsRegistering({from: _voter1}), "Ownable: caller is not the owner");
     });
-   });
-   
+
+    //check require : checker workflowStatus
+    //description : we set the sessions status to a bad status and we check the startProposalsRegistering() function
+    it("startProposalsRegistering() => check require workflowStatus ", async () => {
+      await MyVotingInstance.startProposalsRegistering({from: _owner}); 
+      await MyVotingInstance.endProposalsRegistering({from: _owner}); //we set the session status to an ineligible status
+      await expectRevert(MyVotingInstance.startProposalsRegistering({from: _owner}), "Registering proposals cant be started now");
+    });
+
+    //check status change
+    //description : we get initial status, then we execute function, and we check the new status
+    it("startProposalsRegistering() => check workflowStatus change", async () => {
+    
+      const workflowStatutBeforeChange = await MyVotingInstance.workflowStatus(); // contract.status.call()
+      expect(workflowStatutBeforeChange.toNumber()).to.equal(0); 
+    
+      await MyVotingInstance.startProposalsRegistering({ from: _owner });
+      
+      let workflowStatusAfterChange = await MyVotingInstance.workflowStatus();
+      expect(workflowStatusAfterChange.toNumber()).to.equal(1); 
+  
+      
+    });
+
+    //check well execution of startProposalsRegistering
+    //description : check event
+    it("startProposalsRegistering() => check event startProposalsRegistering", async () => {
+        const result = await MyVotingInstance.startProposalsRegistering({ from: _owner });
+        expectEvent(result, 'WorkflowStatusChange', {
+        previousStatus: new BN(0),newStatus:new BN(1)
+      });
+    
   });
+    
+});
 
 
    //console.log("***********************************");
@@ -171,51 +168,48 @@ context("addVoter() => Check event", function(){
     });
 
     context("addProposal() => Check require", function(){
-      //for all test, we add a voter and change session status to startProposal
-      
+     
+      //check require : Check caller is the owner
+      it("addProposal() => check require onlyVoters", async () => {
+        await expectRevert(MyVotingInstance.addProposal(_proposalDescription1, {from: _voter2}), "You're not a voter"); // a proposal submit by a non registered user
+      });
 
-     //check require : Check caller is the owner
-   it("addProposal() => check require onlyVoters", async () => {
-    await expectRevert(MyVotingInstance.addProposal(_proposalDescription1, {from: _voter2}), "You're not a voter"); // a proposal submit by a non registered user
-  });
-
-  //check require : check empty proposal
-  it("addProposal() => check require empty proposal", async () => {
-   await expectRevert(MyVotingInstance.addProposal(_proposalDescriptionEmpty, {from: _voter1}), "Vous ne pouvez pas ne rien proposer");
-  });
-});
-context("addProposal() => Check function", function(){
-  //for all test, we add a voter and change session status to startProposal
-  
-  //check proposal storage
-  //description : we add a proposal, then we call the proposal from id 1 (id 0 is GENESIS propoasl)
-  //              and we check if they are equal
-  it("addProposal() => check proposal storage", async () => {
-    await MyVotingInstance.addProposal(_proposalDescription1, {from: _voter1});
-    let storeDescription = (await MyVotingInstance.getOneProposal(1, {from: _voter1})).description;
-    assert.equal(storeDescription,_proposalDescription1); //check 1 index and not the 0 index  because by default, at startProposalregistering, a "GENESIS" proposal is set.
-  });
-});
-
-context("addProposal() => Check event", function(){
-  //for all test, we add a voter and change session status to startProposal
-  
-   //check well execution of addProposal
-   //description : check event
-  it("addProposal() => check event ProposalRegistered", async () => {
-    result = await MyVotingInstance.addProposal(_proposalDescription1, {from: _voter1});
-    expectEvent(result, 'ProposalRegistered', {
-      proposalId: new BN(1)
+      //check require : check empty proposal
+      it("addProposal() => check require empty proposal", async () => {
+      await expectRevert(MyVotingInstance.addProposal(_proposalDescriptionEmpty, {from: _voter1}), "Vous ne pouvez pas ne rien proposer");
+      });
     });
-   });
 
-  });
-});
+    context("addProposal() => Check function", function(){
+      
+      //check proposal storage
+      //description : we add a proposal, then we call the proposal from id 1 (id 0 is GENESIS propoasl)
+      //              and we check if they are equal
+      it("addProposal() => check proposal storage", async () => {
+        await MyVotingInstance.addProposal(_proposalDescription1, {from: _voter1});
+        let storeDescription = (await MyVotingInstance.getOneProposal(1, {from: _voter1})).description;
+        assert.equal(storeDescription,_proposalDescription1); //check 1 index and not the 0 index  because by default, at startProposalregistering, a "GENESIS" proposal is set.
+      });
+    });
 
-   //console.log("***********************************");
-   //console.log("Check ProposalsRegistrationEnded function ");
+    context("addProposal() => Check event", function(){
+    
+      //check well execution of addProposal
+      //description : check event
+      it("addProposal() => check event ProposalRegistered", async () => {
+        result = await MyVotingInstance.addProposal(_proposalDescription1, {from: _voter1});
+        expectEvent(result, 'ProposalRegistered', {
+          proposalId: new BN(1)
+        });
+      });
+
+      });
+    });
+
+//console.log("***********************************");
+//console.log("Check ProposalsRegistrationEnded function ");
    
-   describe("Check function ProposalsRegistrationEnded()", function() {
+describe("Check function ProposalsRegistrationEnded()", function() {
 
     beforeEach(async function(){
       MyVotingInstance = await Voting.new({ from: _owner });
@@ -269,21 +263,22 @@ context("addProposal() => Check event", function(){
 
     beforeEach(async function(){
       MyVotingInstance = await Voting.new({ from: _owner });
-     // console.log("l'adress du owner est ",_owner);
     });
 
      //check require : Check caller is the owner
     it("startVotingSession() => check require owner", async () => {
-        await expectRevert(MyVotingInstance.startVotingSession({from: _voter1}), "Ownable: caller is not the owner");
+      await MyVotingInstance.startProposalsRegistering({ from: _owner });
+      await MyVotingInstance.endProposalsRegistering({ from: _owner });
+      await expectRevert(MyVotingInstance.startVotingSession({from: _voter1}), "Ownable: caller is not the owner");
     });
     
    //check require : checker workflowStatus
   //description :  sessions status is initially not the good one 
   //               so we check the startVotingSession() function
- it("startVotingSession() => check require workflowStatus ", async () => {
-    await MyVotingInstance.startProposalsRegistering({from: _owner});  
-    await expectRevert(MyVotingInstance.startVotingSession({from: _owner}), "Registering proposals phase is not finished");
-  });
+  it("startVotingSession() => check require workflowStatus ", async () => {
+      await MyVotingInstance.startProposalsRegistering({from: _owner});  //bas status => we expect a revert
+      await expectRevert(MyVotingInstance.startVotingSession({from: _owner}), "Registering proposals phase is not finished");
+    });
 
   //check status change
   //description : we get initial status, then we execute function, and we check the new status
@@ -323,105 +318,77 @@ context("addProposal() => Check event", function(){
   describe("Check require of function setVote()", function() {
     beforeEach(async function(){
       MyVotingInstance = await Voting.new({ from: _owner });
-     // console.log("l'adress du owner est ",_owner);
+      await MyVotingInstance.addVoter(_voter1, { from: _owner }); //register a voter
+      await MyVotingInstance.startProposalsRegistering({from: _owner});
+      await MyVotingInstance.addProposal(_proposalDescription1,{from: _voter1}); 
+      await MyVotingInstance.endProposalsRegistering({from: _owner});
+      await MyVotingInstance.startVotingSession({from: _owner});
     });
 
     context("setVote() => Check require", function(){
-      //for all test, we add a voter and change session status to startProposal
-  
- //check require : Check caller is the owner
- it("setVote() => check require onlyVoters", async () => {
-  await MyVotingInstance.addVoter(_voter1, { from: _owner }); //register a voter
-  //const result = await MyVotingInstance.startProposalsRegistering({ from: _owner }); //start proposal sesssion
-  await expectRevert(MyVotingInstance.setVote(new BN(1), {from: _voter2}), "You're not a voter");
-});
+      
+      //check require : Check caller is the owner
+      it("setVote() => check require onlyVoters", async () => {
+        await expectRevert(MyVotingInstance.setVote(new BN(1), {from: _voter2}), "You're not a voter");
+      });
 
- //check require : checker workflowStatus
-//description :  set sessions status to a bad state
-//               then try to execute the function
+      //check require : checker workflowStatus
+      //description :  set sessions status to a bad state
+      //               then try to execute the function
+      it("setVote() => check require status", async () => {
+          await MyVotingInstance.endVotingSession({from: _owner});//status is not the good one -> expect to revert
+          await expectRevert(MyVotingInstance.setVote(new BN(0), {from: _voter1}), "Voting session havent started yet");
+       });
 
-it("setVote() => check require status", async () => {
-  await MyVotingInstance.addVoter(_voter1, {from: _owner}); 
-  await MyVotingInstance.startProposalsRegistering({from: _owner}); 
-    await MyVotingInstance.endProposalsRegistering({from: _owner});//we set the session status to an ineligible status
-    await expectRevert(MyVotingInstance.setVote(new BN(0), {from: _voter1}), "Voting session havent started yet");
-  
-  });
-
-//check require : check user has already voted
-//description : set a vote, then set another vote from the same voter
-it("setVote() => check voter has already voted", async () => {
-  await MyVotingInstance.addVoter(_voter1, {from: _owner}); 
-  await MyVotingInstance.startProposalsRegistering({from: _owner}); 
-    await MyVotingInstance.endProposalsRegistering({from: _owner});
-    await MyVotingInstance.startVotingSession({from: _owner});
-    await MyVotingInstance.setVote(new BN(0), {from: _voter1});
-    await expectRevert(MyVotingInstance.setVote(new BN(0), {from: _voter1}), "You have already voted");
-  
-  });
-});
-  
-  context("setVote() => Check function", function(){
-
-    //for all test, we initiate the workflow within "start voting" session status
-    beforeEach(async function(){
-      await MyVotingInstance.addVoter(_voter1, {from: _owner}); 
-      await MyVotingInstance.startProposalsRegistering({from: _owner});
-      await MyVotingInstance.addProposal(_proposalDescription1,{from: _voter1});
-      await MyVotingInstance.endProposalsRegistering({from: _owner});
-      await MyVotingInstance.startVotingSession({from: _owner});
-        // console.log("l'adress du owner est ",_owner);
+      //check require : check user has already voted
+      //description : set a vote, then set another vote from the same voter
+      it("setVote() => check voter has already voted", async () => {
+        await MyVotingInstance.setVote(new BN(0), {from: _voter1});
+        await expectRevert(MyVotingInstance.setVote(new BN(0), {from: _voter1}), "You have already voted");
+      });
     });
-
-//check input ne depasse pas le tab
-it("setVote() => check input id is Ok", async () => {
-
-});
-
-//check setvote storage (counter and proposalId)
-//description : check proposalId and count from a voter before vote
-//              then execute setVote and check proposalId and count after vote
-it("setVote() => check vote storage in voters struct and in proposal array", async () => {
   
-  //Check vote value in voter struct before vote
-  let valueBeforeVote = (await MyVotingInstance.getVoter(_voter1,{from: _voter1})).votedProposalId;
-  assert.equal(valueBeforeVote, new BN(0), 'proposal id should be 0');
+    context("setVote() => Check function", function(){
 
-   //check count vote in proposals array before vote
-   let countValueBeforeVote = (await MyVotingInstance.getOneProposal(new BN(1),{from: _voter1})).voteCount;
-   assert.equal(countValueBeforeVote, new BN(0), 'counter vote should be 0');
- 
-  await MyVotingInstance.setVote(new BN(1), {from: _voter1});
+      //check input ne depasse pas le tab
+      it("setVote() => check input id is Ok", async () => {});
 
-  let valueAfterVote = (await MyVotingInstance.getVoter(_voter1,{from: _voter1})).votedProposalId;
-  assert.equal(valueAfterVote, new BN(1), 'proposal id should be 1');
+      //check setvote storage (counter and proposalId)
+      //description : check proposalId and count from a voter before vote
+      //              then execute setVote and check proposalId and count after vote
+      // je fais ici un seul it meme si j'aurais du découper chaque test de modification de variable dans un it séparé
+      it("setVote() => check vote storage in voters struct and in proposal array", async () => {
+        
+        //Check vote value in voter struct before vote
+        let valueBeforeVote = (await MyVotingInstance.getVoter(_voter1,{from: _voter1})).votedProposalId;
+        assert.equal(valueBeforeVote, new BN(0), 'proposal id should be 0');
 
-  //check count vote in proposals array after vote
-  let countValueAfterVote = (await MyVotingInstance.getOneProposal(new BN(1),{from: _voter1})).voteCount;
-  assert.equal(countValueAfterVote, new BN(1), 'counter vote should be 1');
+        //check count vote in proposals array before vote
+        let countValueBeforeVote = (await MyVotingInstance.getOneProposal(new BN(1),{from: _voter1})).voteCount;
+        assert.equal(countValueBeforeVote, new BN(0), 'counter vote should be 0');
+      
+        await MyVotingInstance.setVote(new BN(1), {from: _voter1});
 
-});
-  });
+        let valueAfterVote = (await MyVotingInstance.getVoter(_voter1,{from: _voter1})).votedProposalId;
+        assert.equal(valueAfterVote, new BN(1), 'proposal id should be 1');
+
+        //check count vote in proposals array after vote
+        let countValueAfterVote = (await MyVotingInstance.getOneProposal(new BN(1),{from: _voter1})).voteCount;
+        assert.equal(countValueAfterVote, new BN(1), 'counter vote should be 1');
+
+      });
+    });
 
   context("setVote() => Check event", function(){
-    beforeEach(async function(){
-      await MyVotingInstance.addVoter(_voter1, {from: _owner}); 
-      await MyVotingInstance.startProposalsRegistering({from: _owner});
-      await MyVotingInstance.addProposal(_proposalDescription1,{from: _voter1});
-      await MyVotingInstance.endProposalsRegistering({from: _owner});
-      await MyVotingInstance.startVotingSession({from: _owner});
-        // console.log("l'adress du owner est ",_owner);
-    });
-//check well execution of setVote
-//description : check event
-it("setVote() => check event", async () => {
- 
-  result = await MyVotingInstance.setVote(new BN(1), {from: _voter1});
-  expectEvent(result, 'Voted', {
-    voter: _voter1,proposalId:new BN(1)
-  });
-});
 
+    //check well execution of setVote
+    //description : check event
+    it("setVote() => check event", async () => {
+      result = await MyVotingInstance.setVote(new BN(1), {from: _voter1});
+      expectEvent(result, 'Voted', {
+      voter: _voter1,proposalId:new BN(1)
+      });
+    });
   });
 });
 
@@ -432,143 +399,121 @@ it("setVote() => check event", async () => {
 
   beforeEach(async function(){
     MyVotingInstance = await Voting.new({ from: _owner });
-   // console.log("l'adress du owner est ",_owner);
+    await MyVotingInstance.startProposalsRegistering({ from: _owner });
+    await MyVotingInstance.endProposalsRegistering({ from: _owner });
+    await MyVotingInstance.startVotingSession({from: _owner})
   });
 
- //check require : Check caller is the owner
- it("endVotingSession() => check require owner", async () => {
-  await expectRevert(MyVotingInstance.endVotingSession({from: _voter1}), "Ownable: caller is not the owner");
-
-});
-
- //check require : checker workflowStatus
-//description :  set sessions status to a bad state
-//               then try to execute function
-it("endVotingSession() => check require workflowStatus ", async () => {
-  await MyVotingInstance.startProposalsRegistering({ from: _owner });
-  await MyVotingInstance.endProposalsRegistering({ from: _owner }); 
-  await expectRevert(MyVotingInstance.endVotingSession({from: _owner}), "Voting session havent started yet");
-});
-
-//check endVotingSession change workflow statut
-it("endVotingSession() => check workflowStatus change", async () => {
-  await MyVotingInstance.startProposalsRegistering({ from: _owner });
-  await MyVotingInstance.endProposalsRegistering({ from: _owner });
-
-  await MyVotingInstance.startVotingSession({from: _owner})
-
-  let workflowStatutBeforeChange = await MyVotingInstance.workflowStatus();
-  expect(workflowStatutBeforeChange.toNumber()).to.equal(3);
-  await MyVotingInstance.endVotingSession({ from: _owner });
-  
-  let workflowStatusAfterChange = await MyVotingInstance.workflowStatus();
-  expect(workflowStatusAfterChange.toNumber()).to.equal(4);
-  
-});
-
-//check well execution of endVotingSession
-//description : check event
-it("endVotingSession() => check event endVotingSession", async () => {
-  await MyVotingInstance.startProposalsRegistering({ from: _owner });
-  await MyVotingInstance.endProposalsRegistering({ from: _owner });
-  await MyVotingInstance.startVotingSession({ from: _owner });
-  const result = await MyVotingInstance.endVotingSession({ from: _owner });
-  expectEvent(result, 'WorkflowStatusChange', {
-    previousStatus: new BN(3),newStatus:new BN(4)
+  //check require : Check caller is the owner
+  it("endVotingSession() => check require owner", async () => {
+    await expectRevert(MyVotingInstance.endVotingSession({from: _voter1}), "Ownable: caller is not the owner");
   });
- });
- });
+
+  //check require : checker workflowStatus
+  //description :  set sessions status to a bad state
+  //               then try to execute function
+  it("endVotingSession() => check require workflowStatus ", async () => {
+    await MyVotingInstance.endVotingSession({ from: _owner }); //we set bad status
+    await expectRevert(MyVotingInstance.endVotingSession({from: _owner}), "Voting session havent started yet");
+  });
+
+  //check endVotingSession change workflow statut
+  it("endVotingSession() => check workflowStatus change", async () => {
+    let workflowStatutBeforeChange = await MyVotingInstance.workflowStatus();
+    expect(workflowStatutBeforeChange.toNumber()).to.equal(3);
+
+    await MyVotingInstance.endVotingSession({ from: _owner });
+    
+    let workflowStatusAfterChange = await MyVotingInstance.workflowStatus();
+    expect(workflowStatusAfterChange.toNumber()).to.equal(4);
+    
+  });
+
+  //check well execution of endVotingSession
+  //description : check event
+  it("endVotingSession() => check event endVotingSession", async () => {
+    const result = await MyVotingInstance.endVotingSession({ from: _owner });
+    expectEvent(result, 'WorkflowStatusChange', {
+      previousStatus: new BN(3),newStatus:new BN(4)
+    });
+  });
+});
 
 
 //console.log("***********************************");
 // console.log("Check tallyVotes function ");
  
-
 describe("Check function tallyVotes()", function() {
   beforeEach(async function(){
     MyVotingInstance = await Voting.new({ from: _owner });
-   // console.log("l'adress du owner est ",_owner);
+    await MyVotingInstance.addVoter(_voter1, {from: _owner}); 
+    await MyVotingInstance.addVoter(_voter2, {from: _owner});
+    await MyVotingInstance.addVoter(_voter3, {from: _owner}); 
+    await MyVotingInstance.startProposalsRegistering({from: _owner});
+    await MyVotingInstance.addProposal(_proposalDescription1,{from: _voter1});
+    await MyVotingInstance.addProposal(_proposalDescription2,{from: _voter2});
+    await MyVotingInstance.addProposal(_proposalDescription3,{from: _voter3});
+    await MyVotingInstance.endProposalsRegistering({from: _owner});
+    await MyVotingInstance.startVotingSession({from: _owner});
+    await MyVotingInstance.setVote(new BN(1), {from: _voter1});
+    await MyVotingInstance.setVote(new BN(2), {from: _voter2});
+    await MyVotingInstance.setVote(new BN(2), {from: _voter3});
+    await MyVotingInstance.endVotingSession({from: _owner});
+ 
   });
+
   context("tallyVotes() => Check require", function(){
 
- //check require owner
- it("tallyVotes() => check require owner", async () => {
-  await expectRevert(MyVotingInstance.tallyVotes({from: _voter1}), "Ownable: caller is not the owner");
-});
+    //check require owner
+    it("tallyVotes() => check require owner", async () => {
+      await expectRevert(MyVotingInstance.tallyVotes({from: _voter1}), "Ownable: caller is not the owner");
+    });
 
-//check require : checker workflowStatus
-//description :  set sessions status to a bad state
-//               then try to execute function
- it("tallyVotes() => check require status", async () => {
-  await MyVotingInstance.startProposalsRegistering({ from: _owner });
-  await MyVotingInstance.endProposalsRegistering({ from: _owner });
-  await MyVotingInstance.startVotingSession({ from: _owner });
-  await expectRevert(MyVotingInstance.tallyVotes({from: _owner}), "Current status is not voting session ended");
-});
+    //check require : checker workflowStatus
+    //description :  set sessions status to a bad state
+    //               then try to execute function
+    it("tallyVotes() => check require status", async () => {
+      await MyVotingInstance.tallyVotes({from: _owner}); //we set bad status to expert a revert
+      await expectRevert(MyVotingInstance.tallyVotes({from: _owner}), "Current status is not voting session ended");
+    });
   });
 
   context("tallyVotes() => Check function", function(){
    
+    //check vote count et winning id
+    //description : Winner should be proposal 2 
+    it("tallyVotes() => check vote winning id", async () => {
+      
+      await MyVotingInstance.tallyVotes({from: _owner});
 
- //check vote count et winning id
- //description : add voters => voters make proposal =>voters vote for proposal => calculate winner
- //              expected winner id => 2
- it("tallyVotes() => check vote winning id", async () => {
-  await MyVotingInstance.addVoter(_voter1, {from: _owner}); 
-  await MyVotingInstance.addVoter(_voter2, {from: _owner});
-  await MyVotingInstance.addVoter(_voter3, {from: _owner}); 
-  await MyVotingInstance.startProposalsRegistering({from: _owner});
-  await MyVotingInstance.addProposal(_proposalDescription1,{from: _voter1});
-  await MyVotingInstance.addProposal(_proposalDescription2,{from: _voter2});
-  await MyVotingInstance.addProposal(_proposalDescription3,{from: _voter3});
-  await MyVotingInstance.endProposalsRegistering({from: _owner});
-  await MyVotingInstance.startVotingSession({from: _owner});
-  await MyVotingInstance.setVote(new BN(1), {from: _voter1});
-  await MyVotingInstance.setVote(new BN(2), {from: _voter2});
-  await MyVotingInstance.setVote(new BN(2), {from: _voter3});
-  await MyVotingInstance.endVotingSession({from: _owner});
-  //Winner should be proposal 2 
-
-  await MyVotingInstance.tallyVotes({from: _owner});
-
-  const winnindId = await MyVotingInstance.winningProposalID();
-  expect(winnindId.toNumber()).to.equal(2);
-  //assert.equal(winnindId.words[0], new BN(2), 'Status should be 2');
-
-});
- 
-//checker status change after execution of function
-it("tallyVotes() => check workflowStatus change", async () => {
-  await MyVotingInstance.startProposalsRegistering({ from: _owner });
-  await MyVotingInstance.endProposalsRegistering({ from: _owner });
-  await MyVotingInstance.startVotingSession({from: _owner})
-  await MyVotingInstance.endVotingSession({from: _owner});
-
-  let workflowStatutBeforeChange = await MyVotingInstance.workflowStatus();
-  expect(workflowStatutBeforeChange.toNumber()).to.equal(4);
-  
-  await MyVotingInstance.tallyVotes({ from: _owner });
-  
-  let workflowStatusAfterChange = await MyVotingInstance.workflowStatus();
-  expect(workflowStatusAfterChange.toNumber()).to.equal(5);
-  
-});
+      const winnindId = await MyVotingInstance.winningProposalID();
+      expect(winnindId.toNumber()).to.equal(2);
+  });
+    
+    //checker status change after execution of function
+    it("tallyVotes() => check workflowStatus change", async () => {
+      
+      let workflowStatutBeforeChange = await MyVotingInstance.workflowStatus();
+      expect(workflowStatutBeforeChange.toNumber()).to.equal(4);
+      
+      await MyVotingInstance.tallyVotes({ from: _owner });
+      
+      let workflowStatusAfterChange = await MyVotingInstance.workflowStatus();
+      expect(workflowStatusAfterChange.toNumber()).to.equal(5);
+      
+    });
   });
 
-  context("tallyVotes() => Check event", function(){
-//check well execution of tallyVotes
-//description : check event
-it("tallyVotes() => check event tallyVotes", async () => {
-  await MyVotingInstance.startProposalsRegistering({ from: _owner });
-  await MyVotingInstance.endProposalsRegistering({ from: _owner });
-  await MyVotingInstance.startVotingSession({ from: _owner });
-  await MyVotingInstance.endVotingSession({ from: _owner });
-  const result = await MyVotingInstance.tallyVotes({from: _owner});
-  expectEvent(result, 'WorkflowStatusChange', {
-    previousStatus: new BN(4),newStatus:new BN(5)
+    context("tallyVotes() => Check event", function(){
+    //check well execution of tallyVotes
+    //description : check event
+    it("tallyVotes() => check event tallyVotes", async () => {
+      
+      const result = await MyVotingInstance.tallyVotes({from: _owner});
+      expectEvent(result, 'WorkflowStatusChange', {
+        previousStatus: new BN(4),newStatus:new BN(5)
+      });
+    });
   });
- });
 });
-});
-
 });

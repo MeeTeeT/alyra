@@ -21,7 +21,7 @@ Pour les fonctions de "traitements" (= toutes les fonctions à l'exclusion des f
 
 Difficultés rencontrées au niveau de la factorisation du code :
 J'ai essayé de factoriser le plus possible de code dans des "beforeEach", qui se trouvent soit au niveau des "subscribe", soit au niveau des "context".
-Ma difficulté réside dans le fait que dans mes fonctions, j'ai un test sur le statut du workflow que je fais en fixant exprès un mauvais statut pour vérifier qu'un revert se fait bien. Mais cette fixation de statut m'empeche de factoriser du code au niveau plus haut dans les "forEach".
+Ma difficulté réside dans le fait que dans toutes mes fonctions, j'ai un test sur le statut du workflow que je fais en fixant exprès un mauvais statut pour vérifier qu'un revert se fait bien. Mais cette fixation de statut m'empeche de factoriser du code plus haut dans les 'foreach' en allant jusqu'au statut approprié du wkf.
 
 3 - Pour chaque fonction, vérification :
 
