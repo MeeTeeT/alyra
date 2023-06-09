@@ -8,42 +8,45 @@ Smart Contract testé : Voting.sol
 
 Environnement : Truffle
 
-Cas testé : 39 tests unitaires
+Cas testé : 40 tests unitaires
 
 ---
 
-Description des tests :
+**Description des tests :**
 
-1 - Execution des tests unitaires en suivant les étapes chronologiques d'éxecution du Workflow de voting
+**1 - Execution des tests unitaires en suivant les étapes chronologiques d'éxecution du Workflow de voting**
 
-2 - Les tests unitaires sont regroupés dans des "describe", un par fonction.
-Pour les fonctions de "traitements" (= toutes les fonctions à l'exclusion des fonctions de changement de statut), les "describe" sont eux mêmes découpés en "context" (require / function / event)
+**2 - Les tests unitaires sont regroupés dans des "describe", un par fonction.**
+Pour les fonctions de "traitements" (= toutes les fonctions à l'exclusion des fonctions de changement de statut), les "describe" sont eux mêmes découpés en "context" (1 context pour les require, 1 contexte pour la computation des functions et un contexte pour la gestion des event)
 
-Difficultés rencontrées au niveau de la factorisation du code :
+\_\_Difficultés rencontrées au niveau de la factorisation du code :
 J'ai essayé de factoriser le plus possible de code dans des "beforeEach", qui se trouvent soit au niveau des "subscribe", soit au niveau des "context".
 Ma difficulté réside dans le fait que dans de nombreuses fonctions, j'ai un test sur le statut du workflow que je fais en fixant exprès un mauvais statut pour vérifier qu'un revert se fait bien. Mais cette fixation de statut m'empeche de factoriser du code plus haut dans les 'foreach' en allant jusqu'au statut approprié du wkf.
 
-3 - Pour chaque fonction, vérification :
+**3 - Pour chaque fonction, vérification :**
 
     - Des "require"
     - Des calculs & stockage des informations
     - De la bonne execution des fonctions avec la vérification des events
 
-4 - Coverage :
+**4 - Coverage :**
 J'ai utilisé truffle et j'ai transféré sur hardhat pour calculer le coverage :
 (Malheureusement, je n'ai pas le temps pour améliorer mes tests pour couvrir un 100% de coverage) :
 
+```
 -------------|----------|----------|----------|----------|----------------|
-File ........| % Stmts .| % Branch | % Funcs .| % Lines |Uncovered Lines |
+File ....    | % Stmts .| % Branch | % Funcs .| % Lines |Uncovered Lines |
 -------------|----------|----------|----------|----------|----------------|
 ..contracts/ | 100 .....| 91.67 ...| 100 .....| 100 .....| |
 ..Voting.sol | 100 .....| 91.67 ...| 100 .....| 100 .....| |
 -------------|----------|----------|----------|----------|----------------|
 ...All files | 100 .....| 91.67 ...| 100 .....| 100 .....| |
 -------------|----------|----------|----------|----------|----------------|
+```
 
-5 - Les tests unitaires sont documentés à l'interieur du script de test unitaire en lui même
+**5 - Les tests unitaires sont documentés à l'interieur du script de test unitaire en lui même**
 
+```
     ************************************************************
     *            Publication du Smart contract                 *
     ************************************************************
@@ -148,3 +151,4 @@ File ........| % Stmts .| % Branch | % Funcs .| % Lines |Uncovered Lines |
         ✓ tallyVotes() => check workflowStatus change
       tallyVotes() => Check event
         ✓ tallyVotes() => check event tallyVotes
+```
